@@ -30,7 +30,6 @@ import com.odysseusinc.arachne.executionengine.config.runtimeservice.RIsolatedRu
 import com.odysseusinc.arachne.executionengine.service.CallbackService;
 import com.odysseusinc.arachne.executionengine.service.RuntimeService;
 import com.odysseusinc.arachne.executionengine.util.FailedCallback;
-import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
 import com.odysseusinc.arachne.executionengine.util.FileResourceUtils;
 import com.odysseusinc.arachne.executionengine.util.ResultCallback;
 import java.io.File;
@@ -317,14 +316,14 @@ public class RuntimeServiceImpl implements RuntimeService {
             StringBuilder stdout = new StringBuilder();
             do {
                 Thread.sleep(submissionUpdateInterval);
-                try (InputStream inputStream = process.getInputStream()) {
-                    final String stdoutDiff = getStdoutDiff(inputStream);
-                    stdout.append(stdoutDiff);
-                    callbackService.updateAnalysisStatus(updateUrl, submissionId, stdoutDiff, password);
-                    if (!stdoutDiff.isEmpty()) {
-                        LOGGER.debug(STDOUT_LOG_DIFF, stdoutDiff);
-                    }
+                InputStream inputStream = process.getInputStream();
+                final String stdoutDiff = getStdoutDiff(inputStream);
+                stdout.append(stdoutDiff);
+                callbackService.updateAnalysisStatus(updateUrl, submissionId, stdoutDiff, password);
+                if (!stdoutDiff.isEmpty()) {
+                    LOGGER.debug(STDOUT_LOG_DIFF, stdoutDiff);
                 }
+
             } while (process.isAlive());
 
             return stdout.toString();

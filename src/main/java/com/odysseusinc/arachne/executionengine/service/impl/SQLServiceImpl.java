@@ -96,33 +96,34 @@ public class SQLServiceImpl implements SQLService {
                         final String sqlFileName = sqlFile.getName();
                         try (OutputStream outputStream = new ByteArrayOutputStream()) {
                             Files.copy(sqlFile.toPath(), outputStream);
-                            Statement statement = conn.createStatement();
-                            if (statement.execute(outputStream.toString())) {
-                                try (ResultSet resultSet = statement.getResultSet()) {
-                                    if (resultSet != null) {
-                                        resultFile = Paths.get(sqlFile.getAbsolutePath() + ".result.csv");
-                                        try (PrintWriter out = new PrintWriter(new BufferedWriter(
-                                                new FileWriter(resultFile.toFile(), true))
-                                        )) {
-                                            ResultSetMetaData metaData = resultSet.getMetaData();
-                                            int columnCount = metaData.getColumnCount();
-                                            for (int column = 1; column <= columnCount; column++) {
-                                                String columnLabel = metaData.getColumnLabel(column);
-                                                out.append(columnLabel);
-                                                if (column < columnCount) {
-                                                    out.append(csvSeparator);
-                                                }
-                                            }
-                                            out.append("\r\n");
-                                            while (resultSet.next()) {
-                                                for (int ii = 1; ii <= columnCount; ii++) {
-                                                    Object object = resultSet.getObject(ii);
-                                                    out.print(object);
-                                                    if (ii < columnCount) {
-                                                        out.print(csvSeparator);
+                            try (Statement statement = conn.createStatement();) {
+                                if (statement.execute(outputStream.toString())) {
+                                    try (ResultSet resultSet = statement.getResultSet()) {
+                                        if (resultSet != null) {
+                                            resultFile = Paths.get(sqlFile.getAbsolutePath() + ".result.csv");
+                                            try (PrintWriter out = new PrintWriter(new BufferedWriter(
+                                                    new FileWriter(resultFile.toFile(), true))
+                                            )) {
+                                                ResultSetMetaData metaData = resultSet.getMetaData();
+                                                int columnCount = metaData.getColumnCount();
+                                                for (int column = 1; column <= columnCount; column++) {
+                                                    String columnLabel = metaData.getColumnLabel(column);
+                                                    out.append(columnLabel);
+                                                    if (column < columnCount) {
+                                                        out.append(csvSeparator);
                                                     }
                                                 }
-                                                out.print("\r\n");
+                                                out.append("\r\n");
+                                                while (resultSet.next()) {
+                                                    for (int ii = 1; ii <= columnCount; ii++) {
+                                                        Object object = resultSet.getObject(ii);
+                                                        out.print(object);
+                                                        if (ii < columnCount) {
+                                                            out.print(csvSeparator);
+                                                        }
+                                                    }
+                                                    out.print("\r\n");
+                                                }
                                             }
                                         }
                                     }

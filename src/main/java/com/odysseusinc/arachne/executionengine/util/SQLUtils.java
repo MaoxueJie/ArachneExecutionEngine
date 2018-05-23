@@ -23,6 +23,7 @@
 package com.odysseusinc.arachne.executionengine.util;
 
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -32,6 +33,7 @@ import org.slf4j.LoggerFactory;
 public class SQLUtils {
     private static final Logger logger = LoggerFactory.getLogger(SQLUtils.class);
 
+    @FileDescriptorCount
     public static Connection getConnection(DataSourceUnsecuredDTO dataSource) throws SQLException {
 
         Connection conn = getConnectionWithAutoCommit(dataSource);
@@ -40,6 +42,7 @@ public class SQLUtils {
         return conn;
     }
 
+    @FileDescriptorCount
     public static Connection getConnectionWithAutoCommit(DataSourceUnsecuredDTO dataSource) throws SQLException {
 
         String user = dataSource.getUsername();
