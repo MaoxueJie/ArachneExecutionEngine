@@ -55,6 +55,7 @@ import java.io.Reader;
 import java.io.UncheckedIOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -233,10 +234,10 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
         try (Connection c = SQLUtils.getConnection(dataSource)) {
             for (String query : statements) {
                 if (StringUtils.isNotBlank(query)) {
-                    PreparedStatement stmt = c.prepareStatement(query);
-                    stmt.setMaxRows(1);
-                    try {
-                        stmt.executeQuery();
+                    try(PreparedStatement stmt = c.prepareStatement(query)) {
+                        stmt.setMaxRows(1);
+                        try(final ResultSet resultSet = stmt.executeQuery()){
+                        }
                     } catch (SQLException e) {
                         throw new StatementSQLException(e.getMessage(), e, query);
                     }

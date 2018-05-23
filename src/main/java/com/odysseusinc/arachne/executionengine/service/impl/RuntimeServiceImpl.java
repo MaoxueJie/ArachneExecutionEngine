@@ -25,6 +25,7 @@ package com.odysseusinc.arachne.executionengine.service.impl;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.AnalysisRequestDTO;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.AnalysisResultStatusDTO;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
 import com.odysseusinc.arachne.executionengine.config.runtimeservice.RIsolatedRuntimeProperties;
 import com.odysseusinc.arachne.executionengine.service.CallbackService;
 import com.odysseusinc.arachne.executionengine.service.RuntimeService;
@@ -316,12 +317,13 @@ public class RuntimeServiceImpl implements RuntimeService {
             StringBuilder stdout = new StringBuilder();
             do {
                 Thread.sleep(submissionUpdateInterval);
-                InputStream inputStream = process.getInputStream();
-                final String stdoutDiff = getStdoutDiff(inputStream);
-                stdout.append(stdoutDiff);
-                callbackService.updateAnalysisStatus(updateUrl, submissionId, stdoutDiff, password);
-                if (!stdoutDiff.isEmpty()) {
-                    LOGGER.debug(STDOUT_LOG_DIFF, stdoutDiff);
+                try (InputStream inputStream = process.getInputStream()) {
+                    final String stdoutDiff = getStdoutDiff(inputStream);
+                    stdout.append(stdoutDiff);
+                    callbackService.updateAnalysisStatus(updateUrl, submissionId, stdoutDiff, password);
+                    if (!stdoutDiff.isEmpty()) {
+                        LOGGER.debug(STDOUT_LOG_DIFF, stdoutDiff);
+                    }
                 }
             } while (process.isAlive());
 
