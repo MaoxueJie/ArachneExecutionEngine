@@ -23,6 +23,8 @@
 package com.odysseusinc.arachne.executionengine.util;
 
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCountAspect;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -34,19 +36,22 @@ public class SQLUtils {
 
     public static Connection getConnection(DataSourceUnsecuredDTO dataSource) throws SQLException {
 
+        FileDescriptorCountAspect.log("before getConnection");
         Connection conn = getConnectionWithAutoCommit(dataSource);
         conn.setAutoCommit(Boolean.FALSE);
-
+        FileDescriptorCountAspect.log("after getConnection");
         return conn;
     }
 
     public static Connection getConnectionWithAutoCommit(DataSourceUnsecuredDTO dataSource) throws SQLException {
 
+        FileDescriptorCountAspect.log("before getConnectionWithAutoCommit");
         String user = dataSource.getUsername();
         String password = dataSource.getPassword();
         String url = dataSource.getConnectionString();
         logger.info("Using JDBC: " + dataSource.getConnectionStringForLogging());
         Connection conn = DriverManager.getConnection(url, user, password);
+        FileDescriptorCountAspect.log("after getConnectionWithAutoCommit");
 
         return conn;
     }
