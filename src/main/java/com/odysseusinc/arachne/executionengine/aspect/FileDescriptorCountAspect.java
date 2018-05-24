@@ -57,7 +57,7 @@ public class FileDescriptorCountAspect {
         }
     }
 
-    private void log(String message) {
+    public static void log(String message) {
 
         OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
         try {

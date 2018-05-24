@@ -22,6 +22,7 @@
 
 package com.odysseusinc.arachne.executionengine.service.impl;
 
+import static com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCountAspect.log;
 import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.CDM_ETL_REFERENCE;
 import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.CDM_HOLDER;
 import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.CDM_RELEASE_DATE;
@@ -38,6 +39,7 @@ import static org.apache.commons.lang3.StringUtils.defaultString;
 import com.odysseusinc.arachne.commons.api.v1.dto.CommonCDMVersionDTO;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.AnalysisRequestDTO;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCountAspect;
 import com.odysseusinc.arachne.executionengine.model.CdmSource;
 import com.odysseusinc.arachne.executionengine.model.Vocabulary;
 import com.odysseusinc.arachne.executionengine.service.CdmMetadataService;
@@ -216,22 +218,6 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
         return Objects.isNull(version) ? null : version.name();
     }
 
-    private void log(String message) {
-
-        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
-        try {
-            if (operatingSystemMXBean instanceof UnixOperatingSystemMXBean) {
-                UnixOperatingSystemMXBean osMxBean = (UnixOperatingSystemMXBean) operatingSystemMXBean;
-                LOGGER.info("{}: open file descriptor count [{}] from max [{}]", message, osMxBean.getOpenFileDescriptorCount(),
-                        osMxBean.getMaxFileDescriptorCount());
-            } else {
-                LOGGER.info("Descriptor count is not supported");
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed to log descriptor count: ", e);
-        }
-    }
-
     private void checkCdmTables(DataSourceUnsecuredDTO dataSource, String pattern, String version) throws SQLException, IOException {
 
         log("before checkCdmTables " + dataSource.getConnectionString());
@@ -252,8 +238,10 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
         sql = SqlRender.renderSql(sql, params, values);
 
         String[] statements = SqlSplit.splitSql(sql);
+        log("mark 1 CdmMetadataServiceImpl checkCdmTables");
 
         try (Connection c = SQLUtils.getConnection(dataSource)) {
+            log("mark 2 CdmMetadataServiceImpl checkCdmTables");
             for (String query : statements) {
                 if (StringUtils.isNotBlank(query)) {
                     try (PreparedStatement stmt = c.prepareStatement(query)) {
@@ -262,6 +250,8 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
                     } catch (SQLException e) {
                         throw new StatementSQLException(e.getMessage(), e, query);
                     }
+                    log("mark 3 CdmMetadataServiceImpl checkCdmTables");
+
                 }
             }
         }

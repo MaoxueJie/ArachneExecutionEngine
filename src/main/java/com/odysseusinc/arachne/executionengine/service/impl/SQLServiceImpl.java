@@ -26,6 +26,7 @@ import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.AnalysisReques
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.AnalysisResultStatusDTO;
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
 import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCountAspect;
 import com.odysseusinc.arachne.executionengine.service.CallbackService;
 import com.odysseusinc.arachne.executionengine.service.SQLService;
 import com.odysseusinc.arachne.executionengine.util.AnalisysUtils;
@@ -87,7 +88,10 @@ public class SQLServiceImpl implements SQLService {
                 Long id = analysis.getId();
                 String callbackPassword = analysis.getCallbackPassword();
 
+                FileDescriptorCountAspect.log("mark 1 SQLServiceImpl analyze");
                 try (Connection conn = SQLUtils.getConnectionWithAutoCommit(dataSource)) {
+
+                    FileDescriptorCountAspect.log("mark 2 SQLServiceImpl analyze");
 
                     List<File> files = AnalisysUtils.getDirectoryItemsFiltered(file, SQL_MATCHER);
                     for (File sqlFile : files) {
@@ -153,6 +157,7 @@ public class SQLServiceImpl implements SQLService {
                         }
                         stdout.append("\r\n---\r\n\r\n");
                         String updateURL = analysis.getUpdateStatusCallback();
+                        FileDescriptorCountAspect.log("mark 3 SQLServiceImpl");
                         callbackService.updateAnalysisStatus(updateURL, id, stdout.toString(), callbackPassword);
                     }
                 } catch (SQLException ex) {
@@ -164,6 +169,7 @@ public class SQLServiceImpl implements SQLService {
                     status = AnalysisResultStatusDTO.FAILED;
                     stdout.append(errorMessage).append("\r\n");
                 }
+                FileDescriptorCountAspect.log("mark 4 SQLServiceImpl ");
                 resultCallback.execute(analysis, status, stdout.toString(), file);
             } catch (Throwable t) {
                 failedCallback.execute(analysis, t, file);

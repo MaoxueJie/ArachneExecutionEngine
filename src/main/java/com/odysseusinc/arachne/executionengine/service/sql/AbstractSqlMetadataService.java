@@ -34,6 +34,8 @@ import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.SOURC
 import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.VOCABULARY_VERSION;
 
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCountAspect;
 import com.odysseusinc.arachne.executionengine.model.CdmSource;
 import com.odysseusinc.arachne.executionengine.model.Vocabulary;
 import com.odysseusinc.arachne.executionengine.util.SQLUtils;
@@ -69,10 +71,11 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
     <T> T executeQuery(String query, SqlFunction<ResultSet, T> consumer) throws SQLException {
 
         Objects.requireNonNull(query);
+        FileDescriptorCountAspect.log("mark 1 AbstractSqlMetadataService executeQuery");
+
         try (final Connection c = SQLUtils.getConnection(dataSource);
              PreparedStatement q = c.prepareStatement(query);
              ResultSet rs = q.executeQuery()) {
-
             return consumer.apply(rs);
         }
     }
@@ -84,6 +87,7 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
         return StringUtils.defaultString(dataSource.getCdmSchema(), getDefaultSchema());
     }
 
+    @FileDescriptorCount
     public List<Vocabulary> getVocabularyVersions(final String cdmVersion) throws SQLException {
 
         RowMapper<Vocabulary> rowMapper = getVocabularyRowMapper(cdmVersion);
@@ -121,6 +125,7 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
 
     protected abstract String getCdmQuery();
 
+    @FileDescriptorCount
     public String getCdmVersion() throws SQLException {
 
         String cdmQuery = String.format(getCdmQuery(), getSchema());
@@ -137,18 +142,24 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
 
         Objects.requireNonNull(tableName);
         String schema = getSchema();
-        try (final Connection c = SQLUtils.getConnection(dataSource)) {
-            ResultSet rs = c.getMetaData().getTables(null, schema, tableName, null);
+        FileDescriptorCountAspect.log("mark 1 AbstractSqlMetadataService tableExists");
+
+        try (final Connection c = SQLUtils.getConnection(dataSource);
+             ResultSet rs = c.getMetaData().getTables(null, schema, tableName, null)) {
+
             while (rs.next()) {
                 if (tableName.equals(rs.getString("TABLE_NAME"))) {
                     return true;
                 }
             }
         }
+        FileDescriptorCountAspect.log("mark 2 AbstractSqlMetadataService tableExists");
+
         return false;
     }
 
     @Override
+    @FileDescriptorCount
     public List<CdmSource> getCdmSources() throws SQLException {
 
         String query = String.format(ALL_CDM_QUERY, getSchema());
