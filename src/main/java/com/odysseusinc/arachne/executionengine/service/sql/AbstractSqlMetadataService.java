@@ -69,11 +69,11 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
     <T> T executeQuery(String query, SqlFunction<ResultSet, T> consumer) throws SQLException {
 
         Objects.requireNonNull(query);
-        try (final Connection c = SQLUtils.getConnection(dataSource)) {
-            PreparedStatement q = c.prepareStatement(query);
-            try (ResultSet rs = q.executeQuery()) {
-                return consumer.apply(rs);
-            }
+        try (final Connection c = SQLUtils.getConnection(dataSource);
+             PreparedStatement q = c.prepareStatement(query);
+             ResultSet rs = q.executeQuery()) {
+
+            return consumer.apply(rs);
         }
     }
 

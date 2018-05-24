@@ -256,9 +256,8 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
         try (Connection c = SQLUtils.getConnection(dataSource)) {
             for (String query : statements) {
                 if (StringUtils.isNotBlank(query)) {
-                    PreparedStatement stmt = c.prepareStatement(query);
-                    stmt.setMaxRows(1);
-                    try {
+                    try (PreparedStatement stmt = c.prepareStatement(query)) {
+                        stmt.setMaxRows(1);
                         stmt.executeQuery();
                     } catch (SQLException e) {
                         throw new StatementSQLException(e.getMessage(), e, query);
