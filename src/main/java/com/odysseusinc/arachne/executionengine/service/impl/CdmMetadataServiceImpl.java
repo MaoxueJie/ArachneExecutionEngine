@@ -46,6 +46,7 @@ import com.odysseusinc.arachne.executionengine.service.sql.SqlMetadataServiceFac
 import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
 import com.odysseusinc.arachne.executionengine.util.SQLUtils;
 import com.odysseusinc.arachne.executionengine.util.exception.StatementSQLException;
+import com.sun.management.UnixOperatingSystemMXBean;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
@@ -53,6 +54,8 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
 import java.io.UncheckedIOException;
+import java.lang.management.ManagementFactory;
+import java.lang.management.OperatingSystemMXBean;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -183,8 +186,25 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
         return new StrSubstitutor(values).replace(COMMENT);
     }
 
+    private void log(String message) {
+
+        OperatingSystemMXBean operatingSystemMXBean = ManagementFactory.getOperatingSystemMXBean();
+        try {
+            if (operatingSystemMXBean instanceof UnixOperatingSystemMXBean) {
+                UnixOperatingSystemMXBean osMxBean = (UnixOperatingSystemMXBean) operatingSystemMXBean;
+                LOGGER.info("{}: open file descriptor count [{}] from max [{}]", message, osMxBean.getOpenFileDescriptorCount(),
+                        osMxBean.getMaxFileDescriptorCount());
+            } else {
+                LOGGER.info("Descriptor count is not supported");
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed to log descriptor count: ", e);
+        }
+    }
+
     private String detectCdmVersion(DataSourceUnsecuredDTO dataSource, SqlMetadataService metadataService) throws SQLException {
 
+        log("Before detectCdmVersion " + dataSource.getConnectionString());
         CommonCDMVersionDTO version = null;
         try {
             for (CommonCDMVersionDTO v : V5_VERSIONS) {
@@ -208,10 +228,13 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
             LOGGER.error("Failed to determine CDM version", e);
             version = null;
         }
+        log("AFTER detectCdmVersion " + dataSource.getConnectionString());
         return Objects.isNull(version) ? null : version.name();
     }
 
     private void checkCdmTables(DataSourceUnsecuredDTO dataSource, String pattern, String version) throws SQLException, IOException {
+
+        log("Before checkCdmTables " + dataSource.getConnectionString());
 
         String sql = detectorSqlMap.computeIfAbsent(
                 Objects.hash(dataSource.getType().getOhdsiDB(), pattern, version),
@@ -244,6 +267,7 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
                 }
             }
         }
+        log("After checkCdmTables " + dataSource.getConnectionString());
 
     }
 
