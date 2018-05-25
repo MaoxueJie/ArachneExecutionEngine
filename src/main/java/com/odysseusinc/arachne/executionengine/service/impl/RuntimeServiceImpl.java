@@ -198,14 +198,20 @@ public class RuntimeServiceImpl implements RuntimeService {
         if (!cleanupScript.exists()) {
             cleanupScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/cleanup.sh", "ee", ".sh");
         }
-
+        Process p = null;
         try {
             ProcessBuilder pb = new ProcessBuilder((String[]) ArrayUtils.addAll(rIsolatedRuntimeProps.getRunCmd(), new String[]{cleanupScript.getAbsolutePath(), directory.getAbsolutePath()}));
-            Process p = pb.start();
+            p = pb.start();
             p.waitFor();
         } catch (InterruptedException ignored) {
         } finally {
             FileUtils.deleteQuietly(cleanupScript);
+            if (Objects.nonNull(p)) {
+                LOGGER.info("cleanupEnvironment - closeQuietly");
+                closeQuietly(p.getOutputStream());
+                closeQuietly(p.getInputStream());
+                closeQuietly(p.getErrorStream());
+            }
         }
     }
 
