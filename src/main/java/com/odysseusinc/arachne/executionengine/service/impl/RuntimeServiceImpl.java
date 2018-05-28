@@ -106,7 +106,8 @@ public class RuntimeServiceImpl implements RuntimeService {
     private int submissionUpdateInterval;
 
     private RIsolatedRuntimeProperties rIsolatedRuntimeProps;
-
+    @Value("${runtimeservice.dist.archive}")
+    private String distArchive;
 
     @Autowired
     public RuntimeServiceImpl(TaskExecutor taskExecutor, CallbackService callbackService, ResourceLoader resourceLoader, RIsolatedRuntimeProperties rIsolatedRuntimeProps) {
@@ -129,7 +130,9 @@ public class RuntimeServiceImpl implements RuntimeService {
 
     private RuntimeServiceMode getRuntimeServiceMode() {
 
-        return StringUtils.isNotBlank(rIsolatedRuntimeProps.getDistArchive()) ? RuntimeServiceMode.ISOLATED : RuntimeServiceMode.SINGLE;
+        //return StringUtils.isNotBlank(rIsolatedRuntimeProps.getDistArchive()) ? RuntimeServiceMode.ISOLATED : RuntimeServiceMode.SINGLE;
+       return StringUtils.isNotBlank(distArchive) ? RuntimeServiceMode.ISOLATED : RuntimeServiceMode.SINGLE;
+
     }
 
     private static String getStdoutDiff(InputStream stream) throws IOException {
@@ -185,24 +188,22 @@ public class RuntimeServiceImpl implements RuntimeService {
 
     private File prepareEnvironment(File directory) throws IOException {
 
+        return FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/jail.sh", "ee", ".sh");
+/*
         File jailScript = new File(rIsolatedRuntimeProps.getJailSh());
         if (!jailScript.exists()) {
             LOGGER.info("jailScript is not exist");
             jailScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/jail.sh", "ee", ".sh");
         }
-        return jailScript;
+        return jailScript;*/
     }
 
     private void cleanupEnvironment(File directory) throws IOException {
 
-        File cleanupScript = new File(rIsolatedRuntimeProps.getCleanupSh());
-        if (!cleanupScript.exists()) {
-            LOGGER.info("cleanupScript is not exist");
-            cleanupScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/cleanup.sh", "ee", ".sh");
-        }
+        File cleanupScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/cleanup.sh", "ee", ".sh");
         Process p = null;
-        try {
-            ProcessBuilder pb = new ProcessBuilder((String[]) ArrayUtils.addAll(rIsolatedRuntimeProps.getRunCmd(), new String[]{cleanupScript.getAbsolutePath(), directory.getAbsolutePath()}));
+        try{
+            ProcessBuilder pb = new ProcessBuilder("bash", cleanupScript.getAbsolutePath(), directory.getAbsolutePath());
             p = pb.start();
             p.waitFor();
         } catch (InterruptedException ignored) {
@@ -232,7 +233,8 @@ public class RuntimeServiceImpl implements RuntimeService {
         }
         String[] command;
         if (RuntimeServiceMode.ISOLATED.equals(getRuntimeServiceMode())) {
-            command = (String[]) ArrayUtils.addAll(rIsolatedRuntimeProps.getRunCmd(), new String[]{runFile.getAbsolutePath(), workingDir.getAbsolutePath(), fileName, rIsolatedRuntimeProps.getDistArchive()});
+            //command = (String[]) ArrayUtils.addAll(rIsolatedRuntimeProps.getRunCmd(), new String[]{runFile.getAbsolutePath(), workingDir.getAbsolutePath(), fileName, rIsolatedRuntimeProps.getDistArchive()});
+            command = new String[]{"bash", runFile.getAbsolutePath(), workingDir.getAbsolutePath(), fileName, distArchive};
         } else {
             command = new String[]{EXECUTION_COMMAND, fileName};
         }
