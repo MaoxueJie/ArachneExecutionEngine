@@ -187,6 +187,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 
         File jailScript = new File(rIsolatedRuntimeProps.getJailSh());
         if (!jailScript.exists()) {
+            LOGGER.info("jailScript is not exist");
             jailScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/jail.sh", "ee", ".sh");
         }
         return jailScript;
@@ -196,6 +197,7 @@ public class RuntimeServiceImpl implements RuntimeService {
 
         File cleanupScript = new File(rIsolatedRuntimeProps.getCleanupSh());
         if (!cleanupScript.exists()) {
+            LOGGER.info("cleanupScript is not exist");
             cleanupScript = FileResourceUtils.extractResourceToTempFile(resourceLoader, "classpath:/cleanup.sh", "ee", ".sh");
         }
         Process p = null;
