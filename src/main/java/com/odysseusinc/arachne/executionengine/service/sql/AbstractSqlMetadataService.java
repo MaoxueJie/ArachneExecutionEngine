@@ -34,6 +34,7 @@ import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.SOURC
 import static com.odysseusinc.arachne.executionengine.util.CdmSourceFields.VOCABULARY_VERSION;
 
 import com.odysseusinc.arachne.execution_engine_common.api.v1.dto.DataSourceUnsecuredDTO;
+import com.odysseusinc.arachne.executionengine.aspect.FileDescriptorCount;
 import com.odysseusinc.arachne.executionengine.model.CdmSource;
 import com.odysseusinc.arachne.executionengine.model.Vocabulary;
 import com.odysseusinc.arachne.executionengine.util.SQLUtils;
@@ -132,6 +133,7 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
     }
 
     @Override
+    @FileDescriptorCount
     public boolean tableExists(String tableName) throws SQLException {
 
         Objects.requireNonNull(tableName);
@@ -149,6 +151,7 @@ abstract class AbstractSqlMetadataService implements SqlMetadataService {
     }
 
     @Override
+    @FileDescriptorCount
     public List<CdmSource> getCdmSources() throws SQLException {
 
         String query = String.format(ALL_CDM_QUERY, getSchema());
