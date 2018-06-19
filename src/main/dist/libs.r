@@ -5,7 +5,7 @@ install_version("drat", version="0.1.3", type="source")
 drat::addRepo(c("OHDSI","cloudyr"))
 
 if ("CohortMethod" %in% installed.packages() == FALSE){
-  install_github("OHDSI/CohortMethod", ref="v2.4.4")
+  install_github("OHDSI/CohortMethod", ref="v2.6.2")
 }
 if ("DatabaseConnector" %in% installed.packages() == FALSE){
   install_github("OHDSI/DatabaseConnector", ref="33b2c0b") # v2.1.2
@@ -14,7 +14,7 @@ if ("EmpiricalCalibration" %in% installed.packages() == FALSE){
   install_github("OHDSI/EmpiricalCalibration", ref="320f670") # v1.3.5
 }
 if ("FeatureExtraction" %in% installed.packages() == FALSE){
-  install_github("OHDSI/FeatureExtraction") # ref="v2.1.1"
+  install_github("OHDSI/FeatureExtraction", ref="v2.1.4")
 }
 if ("OhdsiRTools" %in% installed.packages() == FALSE){
   install_github("OHDSI/OhdsiRTools", ref="b938cf1") # v1.3.3
