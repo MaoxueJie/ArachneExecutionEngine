@@ -176,7 +176,9 @@ public class RuntimeServiceImpl implements RuntimeService {
                         if (!isExternalJail()) {
                             FileUtils.deleteQuietly(runFile);
                         }
-                        FileUtils.deleteQuietly(krbConfig.getComponents().getKeytabPath().toFile());
+                        if (krbConfig.getComponents() != null && krbConfig.getComponents().getKeytabPath() != null) {
+                            FileUtils.deleteQuietly(krbConfig.getComponents().getKeytabPath().toFile());
+                        }
                         if (RuntimeServiceMode.ISOLATED == krbConfig.getMode()) {
                             FileUtils.deleteQuietly(krbConfig.getConfPath().toFile());
                         }
