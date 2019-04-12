@@ -129,7 +129,7 @@ public class AnalysysControllerTest {
         String URL = BASE_URL + ":" + serverPort + AnalisysController.REST_API_MAIN + AnalisysController.REST_API_ANALYZE;
         AnalysisRequestDTO analysis = getAnalysis();
         analysis.setId(null);
-        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = getRequestEntity(analysis, null);
+        HttpEntity<LinkedMultiValueMap<String, Object>> requestEntity = getRequestEntity(analysis);
         ResponseEntity<String> exchange = restTemplate.exchange(
                 URL,
                 HttpMethod.POST, requestEntity,
