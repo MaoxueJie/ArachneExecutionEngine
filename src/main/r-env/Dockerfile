@@ -10,6 +10,7 @@ RUN apt-get install -y libcurl4-openssl-dev
 RUN apt-get install -y libssl-dev 
 RUN apt-get install -y libxml2-dev curl libssh-dev libxml2-dev r-cran-xml libdigest-hmac-perl libcairo2-dev
 
+RUN gcc -v
 
 COPY Python-2.7.3.tgz Python-2.7.3.tgz
 RUN tar -xzf Python-2.7.3.tgz
