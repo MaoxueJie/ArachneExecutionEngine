@@ -227,6 +227,7 @@ public class CdmMetadataServiceImpl implements CdmMetadataService {
 
         String[] params = new String[]{VAR_CDM_SCHEMA};
         String[] values = new String[]{dataSource.getCdmSchema()};
+        LOGGER.info(sql +"|"+ params+"|" + values);
         sql = SqlRender.renderSql(sql, params, values);
 
         String[] statements = SqlSplit.splitSql(sql);
