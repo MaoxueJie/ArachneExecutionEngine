@@ -287,10 +287,12 @@
                 <configuration>
                     <imageName>${dockerImagePrefix}/${project.artifactId}</imageName>
                     <imageTags>
+                         <!-- 
                         <imageTag>latest${latestSuffix}</imageTag>
-                        <!--  
+                        
                         <imageTag>${project.version}</imageTag>
                         -->
+                        <imageTag>latest</imageTag>
                     </imageTags>
                     <dockerDirectory>src/main/docker</dockerDirectory>
                     <resources>
