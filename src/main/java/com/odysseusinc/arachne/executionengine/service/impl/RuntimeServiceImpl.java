@@ -161,6 +161,7 @@ public class RuntimeServiceImpl implements RuntimeService {
                     try {
                         String[] command = buildRuntimeCommand(runFile, file, executableFileName);
                         final Map<String, String> envp = buildRuntimeEnvVariables(dataSource);
+                        LOGGER.info(envp.toString());
                         finishStatus = runtime(command, envp, file, runtimeTimeOutSec, updateStatusCallback, id, callbackPassword);
                         AnalysisResultStatusDTO resultStatusDTO = finishStatus.exitCode == 0
                                 ? AnalysisResultStatusDTO.EXECUTED : AnalysisResultStatusDTO.FAILED;
