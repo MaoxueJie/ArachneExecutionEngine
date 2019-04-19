@@ -97,6 +97,7 @@ public class AnalisysUtils {
         } else {
             writeContentToDir(temporaryDir, files);
         }
+        log.info("---------------------------------"+temporaryDir.getAbsolutePath());
         return temporaryDir;
     }
 
@@ -122,7 +123,7 @@ public class AnalisysUtils {
                 CommonFileUtils.unzipFiles(zippedFile, parent);
             }
         } finally {
-        	log.info(temporaryDir.getAbsolutePath());
+        	
             //暂时不删除org.apache.commons.io.FileUtils.deleteQuietly(temporaryDir);
         }
     }
