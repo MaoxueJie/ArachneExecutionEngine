@@ -122,7 +122,8 @@ public class AnalisysUtils {
                 CommonFileUtils.unzipFiles(zippedFile, parent);
             }
         } finally {
-            org.apache.commons.io.FileUtils.deleteQuietly(temporaryDir);
+        	log.info(temporaryDir.getAbsolutePath());
+            //暂时不删除org.apache.commons.io.FileUtils.deleteQuietly(temporaryDir);
         }
     }
 
