@@ -97,8 +97,6 @@ public class AnalisysUtils {
         } else {
             writeContentToDir(temporaryDir, files);
         }
-        //writeContentToDir(new File("/jiemaoxue/"), files);
-        log.info("---------------------------------"+ compressed + temporaryDir.getAbsolutePath());
         return temporaryDir;
     }
 
