@@ -1,4 +1,4 @@
-FROM gohda/r-env
+FROM gohda/r-env-base
 MAINTAINER jiemx2008@163.com
 ADD execution-engine.jar /execution-engine.jar
 RUN mkdir /impala
